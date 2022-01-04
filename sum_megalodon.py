@@ -88,11 +88,16 @@ def flow_process_megalodon(in_file, promoter_file, sample="WT", wkdir=os.getcwd(
 if __name__ == "__main__":
     import argparse
 
-    example_text = '''example: ### example to run the sum_megalodon.py sum_megalodon.py --i modified_bases.6mA.bed -a 
-    gene.bed -s sample The script will generate sample_sum.txt and sample_promoter.csv as the result #### out: 
-    sample_promoter.csv: gene, proportion (gene is the region defined in gene.bed) out: sample_sum.txt: sample, all, 
-    gene_all #### input of modified_bases.6mA.bed is a 11 col megalodon result input of gene.bed is a 6 col 
-    annotation bed with "chr start end name coverage strand" information, the coverage column can be empty '''
+    example_text = '''example: 
+    ### example to run the sum_megalodon.py 
+    sum_megalodon.py -i modified_bases.6mA.bed -a gene.bed -s sample 
+    ### The script will generate sample_sum.txt and sample_promoter.csv as the result: 
+    out: sample_promoter.csv: gene, proportion (gene is the region defined in gene.bed) 
+    out: sample_sum.txt: sample, all, gene_all 
+    #### 
+    input of modified_bases.6mA.bed is a 11 col megalodon result 
+    input of gene.bed is a 6 col annotation bed with "chr start end name coverage strand" information, the coverage column can be empty '''
+
     parser = argparse.ArgumentParser(prog='sum_megaladon',
                                      description='megalodon bed parser, generate the overall sum for proportion and the regional summary for a givien region, like the promoter region',
                                      epilog=example_text,
