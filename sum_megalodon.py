@@ -14,7 +14,9 @@ import os
 from utils import myexe
 
 import logger
-LOGGER=logger.get_logger()
+
+LOGGER = logger.get_logger()
+
 
 def sum_5mc_ratio(d0):
     """
@@ -33,8 +35,10 @@ def sum_inter_promoter(in_filename, out_filename):
     return the gene:mean propotion in promoter info
     """
     df_inter = pandas.read_csv(in_filename, sep="\t", header=None)
-    last_col=len(df_inter.columns)
-    df = df_inter.groupby([3])[last_col-1].mean()
+    methycol = len(df_inter.columns) - 1
+    covcol = len(df_inter.columns) - 2
+    df_inter["methycov"] = df_inter[methycol] / 100 * df_inter[covcol]
+    df = df_inter.groupby([3])["methycov"].sum() / df_inter.groupby([3])[covcol].sum()
     df.to_csv(out_filename, header=False)
 
 
@@ -81,26 +85,23 @@ def flow_process_megalodon(in_file, promoter_file, sample="WT", wkdir=os.getcwd(
     return 0
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     import argparse
-    example_text = '''example:
-    ### example to run the sum_megalodon.py 
-    sum_megalodon.py --i modified_bases.6mA.bed -a gene.bed -s sample 
-    The script will generate sample_sum.txt and sample_promoter.csv as the result
-    ####
-    out: sample_promoter.csv: gene, proportion (gene is the region defined in gene.bed)
-    out: sample_sum.txt: sample, all, gene_all
-    #### 
-    input of modified_bases.6mA.bed is a 11 col megalodon result
-    input of gene.bed is a 6 col annotation bed with "chr start end name coverage strand" information, the coverage column can be empty
-    '''
+
+    example_text = '''example: ### example to run the sum_megalodon.py sum_megalodon.py --i modified_bases.6mA.bed -a 
+    gene.bed -s sample The script will generate sample_sum.txt and sample_promoter.csv as the result #### out: 
+    sample_promoter.csv: gene, proportion (gene is the region defined in gene.bed) out: sample_sum.txt: sample, all, 
+    gene_all #### input of modified_bases.6mA.bed is a 11 col megalodon result input of gene.bed is a 6 col 
+    annotation bed with "chr start end name coverage strand" information, the coverage column can be empty '''
     parser = argparse.ArgumentParser(prog='sum_megaladon',
                                      description='megalodon bed parser, generate the overall sum for proportion and the regional summary for a givien region, like the promoter region',
                                      epilog=example_text,
                                      formatter_class=argparse.RawDescriptionHelpFormatter)
 
-    parser.add_argument("-i", "--input", help="the megalodon bed file with 11 cols, the bed follows the bedtool bedgraph format, with strand information in col6, name information in col4, coverage information in col5")
-    parser.add_argument("-a", "--annotation", help="the annotation bed file, with at least 6 cols following the bedtool format, with strand information in col6, name information in col4")
+    parser.add_argument("-i", "--input",
+                        help="the megalodon bed file with 11 cols, the bed follows the bedtool bedgraph format, with strand information in col6, name information in col4, coverage information in col5")
+    parser.add_argument("-a", "--annotation",
+                        help="the annotation bed file, with at least 6 cols following the bedtool format, with strand information in col6, name information in col4")
     parser.add_argument("-p", "--prefix", default="sample", help="the prefix of the output files")
 
     args = parser.parse_args()
